@@ -31,80 +31,40 @@ import nz.geek.android.things.driver.display.I2cLcdCharacterDisplay;
  */
 public class MainActivity extends Activity {
 
+  // how many characters wide is your display?
+  private static final int LCD_WIDTH = 16;
+
+  // How many characters high is your display?
+  private static final int LCD_HEIGHT = 4;
+
   CharacterDisplay lcd;
-  CharacterDisplay lcd2;
-  CharacterDisplay lcd3;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    initDisplay1();
-    initDisplay2();
-    initDisplay3();
-
+    initDisplay();
   }
 
-  private void initDisplay1() {
+
+  private void initDisplay() {
     // create a display builder with the LCD module width and height
-    I2cLcdCharacterDisplay.Builder builder = I2cLcdCharacterDisplay.builder(40, 4);
-
-    // set port pin to LCD pin mapping, and PCF8574(A) address
-    builder.rs(0).rw(1).e(2).e2(3).data(4, 5, 6, 7).address(5)
-            .withBus(busList().get(0));
-
-    // build and use the display
-    lcd = builder.build();
-    lcd.connect();
-
-    // write message to the display, the first argument
-    // is the LCD line (row) number
-    lcd.print(1, "Hello Android Things! It actually works!");
-    lcd.print(2, "I don't believe it. It must be true.");
-    lcd.print(3, "OMG This is such a big display,");
-    lcd.print(4, "I could write a novel, a very short one.");
-  }
-
-  private void initDisplay2() {
-    // create a display builder with the LCD module width and height
-    I2cLcdCharacterDisplay.Builder builder = I2cLcdCharacterDisplay.builder(16, 4);
+    I2cLcdCharacterDisplay.Builder builder = I2cLcdCharacterDisplay.builder(LCD_WIDTH, LCD_HEIGHT);
 
     // set port pin to LCD pin mapping, and PCF8574(A) address
     builder.rs(0).rw(1).e(2).bl(3).data(4, 5, 6, 7).address(7)
             .withBus(busList().get(0));
 
     // build and use the display
-    lcd2 = builder.build();
-    lcd2.connect();
-    lcd2.enableBackLight(true);
+    lcd = builder.build();
+    lcd.connect();
+    lcd.enableBackLight(true);
 
     // write message to the display, the first argument
     // is the LCD line (row) number
-    lcd2.print(1, "Three displays?");
-    lcd2.print(2, "Now you're just");
-    lcd2.print(3, "showing off");
-    lcd2.print(4, "I mean, really.");
+    lcd.print(1, "Android Things!");
+    lcd.print(2, "You're great.");
   }
-
-  private void initDisplay3() {
-    // create a display builder with the LCD module width and height
-    I2cLcdCharacterDisplay.Builder builder = I2cLcdCharacterDisplay.builder(40, 2);
-
-    // set port pin to LCD pin mapping, and PCF8574(A) address
-    builder.rs(0).rw(1).e(2).bl(3).data(4, 5, 6, 7).address(6)
-            .withBus(busList().get(0));
-
-    // build and use the display
-    lcd3 = builder.build();
-    lcd3.connect();
-    lcd3.enableBackLight(true);
-
-    // write message to the display, the first argument
-    // is the LCD line (row) number
-    lcd3.print(1, "Wait a minute, two displays, what gives?");
-    lcd3.print(2, "That's just CRRAAZZZYYY!?!?");
-  }
-
 
   private List<String> busList() {
     return PeripheralManager.getInstance().getI2cBusList();
@@ -112,17 +72,12 @@ public class MainActivity extends Activity {
 
   @Override
   protected void onDestroy() {
+
+    // disconnect from the display to close the i2cDevice
     if (lcd != null) {
       lcd.disconnect();
     }
 
-    if (lcd2 != null) {
-      lcd2.disconnect();
-    }
-
-    if (lcd3 != null) {
-      lcd3.disconnect();
-    }
     super.onDestroy();
   }
 }
